@@ -41,17 +41,6 @@
       box-shadow: 0 6px 24px rgba(0,0,0,0.07);
     }
 
-    .question-number {
-      font-size: 0.9rem;
-      color: #555;
-      margin-bottom: 4px;
-    }
-
-    .question-text {
-      font-size: 1.05rem;
-      margin-bottom: 16px;
-    }
-
     .btn-primary {
       background: #0070f3;
       color: #fff;
@@ -73,22 +62,6 @@
       cursor: pointer;
       font-size: 0.95rem;
       font-weight: 600;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 10px 12px;
-      margin-top: 4px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-
-    label {
-      margin-top: 16px;
-      display: block;
-      font-size: 0.95rem;
-      color: #444;
     }
 
     .result-section-block {
@@ -113,16 +86,11 @@
       margin: 8px 0;
     }
 
-    .schedule-btn {
-      display:inline-block;
-      background:#0070f3;
-      color:#fff;
-      padding:12px 20px;
-      border-radius:8px;
-      text-decoration:none;
-      font-size:15px;
-      font-weight:600;
-      margin-top:16px;
+    /* ウィジェットエリア用（崩れ防止） */
+    .widget-wrapper {
+      margin-top: 20px;
+      width: 100%;
+      min-height: 450px;
     }
   </style>
 </head>
@@ -132,27 +100,9 @@
   <h1>サイト運用＆リード活用診断</h1>
   <p>BtoB企業の「サイト運用」と「リード活用」の現在地を可視化する簡易診断ツールです。</p>
 
-  <!-- STEP0 -->
-  <div id="info-section" class="section-card">
-    <h2>STEP0：診断レポート用の情報</h2>
-    <p>診断結果レポートを貴社向けに作成するため、以下を入力してください。</p>
-
-    <label>① 会社名
-      <input type="text" id="company-name" placeholder="例：〇〇株式会社" />
-    </label>
-    <label>② お名前（名字のみ可）
-      <input type="text" id="person-name" placeholder="例：上野" />
-    </label>
-    <label>③ 役職
-      <input type="text" id="title" placeholder="例：マーケティング部 課長" />
-    </label>
-
-    <button id="start-btn" class="btn-primary">診断をはじめる</button>
-  </div>
-
   <!-- STEP1 -->
-  <div id="question-section" class="section-card" style="display:none;">
-    <h2>STEP1：10問診断（はい／いいえ）</h2>
+  <div id="question-section" class="section-card">
+    <h2>10問診断（はい／いいえ）</h2>
     <p>直感でお答えいただいて大丈夫です。</p>
 
     <div class="question-number" id="question-number"></div>
@@ -166,9 +116,8 @@
 
   <!-- STEP3 -->
   <div id="result-section" style="display:none;">
-    <h2>STEP3：診断結果レポート</h2>
+    <h2>診断結果レポート</h2>
     <div id="report-wrapper"></div>
-
     <button id="restart-btn" class="btn-secondary" style="margin-top:24px;">最初からやり直す</button>
   </div>
 </div>
@@ -200,66 +149,65 @@ const typeDefinitions = {
   A: {
     label: "A：運用属人化タイプ",
     description:
-      "Web運用が少人数に依存しており、更新が止まりやすく負荷分散も難しい状態です。",
+      "Web運用が少人数に依存しており、更新が止まりやすい状態です。",
     failures: [
-      "更新作業が担当者の忙しさに左右されやすい",
+      "更新が担当者の忙しさに左右される",
       "ナレッジや手順が属人化している",
-      "依頼ベースでの対応が多く、全体最適がしにくい"
+      "依頼ベースが多く全体最適がしづらい"
     ],
     actions: [
-      "運用フロー（依頼→原稿→校正→公開）を明文化し、共有可能な形式にする",
-      "月次更新スケジュールをあらかじめ設定しておく",
-      "簡易ダッシュボードでKPIを月1だけでも共有する"
+      "運用フローを明文化し共有",
+      "月次更新スケジュール設定",
+      "KPIを月1共有"
     ]
   },
   B: {
     label: "B：コンテンツ停滞タイプ",
     description:
-      "コンテンツ更新が後回しになり、情報発信の鮮度が落ちやすい状態です。",
+      "情報発信の鮮度が落ち、更新が止まりやすい状態です。",
     failures: [
-      "最新情報・事例・コラムの更新が止まりやすい",
-      "営業が使える資料が不足し、Web活用が進みにくい",
-      "コンテンツ案はあるが制作に進まない"
+      "最新情報や事例更新が止まりやすい",
+      "営業資料が不足しWeb活用が弱い",
+      "コンテンツ案はあるが制作されない"
     ],
     actions: [
-      "今期に出す3本だけテーマ・時期を決めて確定する",
-      "営業・CSのFAQをそのままコンテンツ化する",
-      "社内→たたき、外部パートナー→整形 の体制を検討する"
+      "今期の3本だけテーマ確定",
+      "FAQをそのままコンテンツ化",
+      "社内→たたき / 外部→整形 の体制"
     ]
   },
   C: {
     label: "C：単発施策迷子タイプ",
     description:
-      "施策ごとの粒度では動けているものの、全体像や成功基準が共有されない状態です。",
+      "施策の全体最適や成功基準が共有されていない状態です。",
     failures: [
-      "施策の成果がどこに効いたのか把握しづらい",
-      "リニューアルの目的が曖昧なまま議論されがち",
-      "営業からの個別依頼対応に追われがち"
+      "成果がどこに効いたか不明瞭",
+      "リニューアル目的が曖昧",
+      "営業の個別依頼で追われがち"
     ],
     actions: [
-      "まず1つのKPI（商談化数など）に絞り現状値を把握する",
-      "リード→商談の流れを簡易ファネルで見える化する",
-      "施策前に“どこを強化する施策か”をA4一枚で共有する"
+      "KPIを1つに絞る",
+      "ファネルでリード〜商談を可視化",
+      "施策意図をA4にまとめ共有"
     ]
   },
   NONE: {
     label: "課題顕在化なし",
-    description:
-      "大きな課題は特に見られず、基本的な運用は十分整っている可能性が高い状態です。"
+    description: "大きな課題は見られず基礎運用が整っている状態です。"
   }
 };
 
 const questionComments = [
-  "更新が止まりやすい点は優先度見直しの重要ポイントです。",
-  "コンテンツ量が少ないため、テーマ設計から始めると効果的です。",
-  "MA/メール運用は簡易シナリオから着手するのが近道です。",
-  "営業専用の“事例・資料入り口”を作ると負荷が減ります。",
-  "問い合わせ以外のCV設計が鍵になりそうです。",
-  "商談化率の追い方だけ整えると成果が見えやすくなります。",
+  "更新が止まりやすい点は優先度見直しが必要です。",
+  "テーマ設計から始めると効果が出やすいです。",
+  "MAは簡易シナリオから始めるのが近道です。",
+  "営業専用の資料入口を作ると負荷削減できます。",
+  "CV設計が成果を大きく左右します。",
+  "商談化率の見える化だけでも成果が出ます。",
   "属人化解消はリスク低減に直結します。",
-  "リニューアル目的の言語化が最初の一歩になりそうです。",
-  "成果レポートは“売上にどうつながるか”の絞り込みが有効です。",
-  "既存顧客向けのTips配信から着手すると改善が早いです。"
+  "目的言語化が最初の一歩になります。",
+  "成果レポートは売上視点に絞ると刺さります。",
+  "既存顧客向けTips配信は即効果が出ます。"
 ];
 
 /* -----------------------
@@ -267,26 +215,11 @@ const questionComments = [
 ------------------------ */
 let answers = [];
 let currentQuestion = 0;
-let companyName = "";
-let personName = "";
-let titleName = "";
 
 /* -----------------------
-   STEP0 → STEP1
+   初期表示
 ------------------------ */
-document.getElementById("start-btn").onclick = () => {
-  companyName = document.getElementById("company-name").value.trim();
-  personName = document.getElementById("person-name").value.trim();
-  titleName = document.getElementById("title").value.trim();
-
-  if (!companyName || !personName || !titleName) {
-    alert("①会社名 ②お名前 ③役職 をすべて入力してください。");
-    return;
-  }
-
-  document.getElementById("info-section").style.display = "none";
-  document.getElementById("question-section").style.display = "block";
-
+window.onload = () => {
   answers = [];
   currentQuestion = 0;
   showQuestion();
@@ -302,14 +235,13 @@ function showQuestion() {
 }
 
 /* -----------------------
-   質問 → 次へ
+   回答処理
 ------------------------ */
 document.getElementById("yes-btn").onclick = () => handleAnswer(1);
 document.getElementById("no-btn").onclick = () => handleAnswer(0);
 
 function handleAnswer(v) {
   answers.push(v);
-
   if (currentQuestion < 9) {
     currentQuestion++;
     showQuestion();
@@ -320,7 +252,7 @@ function handleAnswer(v) {
 }
 
 /* -----------------------
-   ★ 新・判定ロジック（A > B > C）
+   判定
 ------------------------ */
 function calcType() {
   const scores = {
@@ -329,147 +261,129 @@ function calcType() {
     C: typeQuestionMap.C.reduce((s, i) => s + answers[i], 0)
   };
 
-  const totalYes = scores.A + scores.B + scores.C;
+  const total = scores.A + scores.B + scores.C;
+  if (total === 0) return "NONE";
 
-  // ① 全部「いいえ」なら NONE
-  if (totalYes === 0) return "NONE";
-
-  // ② 最大値を取得
   const max = Math.max(scores.A, scores.B, scores.C);
-
-  // ③ 最大値のタイプを収集
   const tied = [];
   if (scores.A === max) tied.push("A");
   if (scores.B === max) tied.push("B");
   if (scores.C === max) tied.push("C");
 
-  // ④ 単独ならそれを返す
   if (tied.length === 1) return tied[0];
-
-  // ⑤ 同点時の優先順位：A > B > C
   if (tied.includes("A")) return "A";
   if (tied.includes("B")) return "B";
   return "C";
 }
 
 /* -----------------------
-   ★ レポート生成
+   結果生成
 ------------------------ */
 function showResult() {
   const type = calcType();
-  const yesList = answers.map((v,i)=>v===1?i:null).filter(v=>v!==null);
-  const picked = yesList.slice(0,3);
+  const picked = answers
+    .map((v,i)=>v===1?i:null)
+    .filter(v=>v!==null)
+    .slice(0,3);
 
   let html = "";
 
-  /* ▼ NONE専用レポート */
+  /* NONE */
   if (type === "NONE") {
     html += `
       <div class="result-section-block">
         <h3>1. 冒頭サマリー</h3>
-        <p>${companyName}　${titleName} ${personName} 様<br>
-        診断にご協力いただき誠にありがとうございました。<br>
-        ご回答内容から拝見すると、貴社のサイト運用には
-        <strong>顕著な問題は見られませんでした。</strong></p>
+        <p>診断にご協力いただきありがとうございました。<br>
+        大きな課題は見られませんでした。</p>
       </div>
 
       <div class="result-section-block">
-        <h3>2. 現状の評価</h3>
-        <p>全体として大きく困っている点は少なく、基礎的な運用は十分整っていると推察されます。</p>
-      </div>
-
-      <div class="result-section-block">
-        <h3>3. 今後の伸びしろ</h3>
+        <h3>2. 今後の伸びしろ</h3>
         <ul>
-          <li>月1の定例で改善ポイントを確認するだけでも効果が出やすいです。</li>
-          <li>コンテンツの型化・テンプレ化により運用負荷をさらに下げられます。</li>
-          <li>リード活用のシナリオを1本だけ設計すると成果につながります。</li>
+          <li>月1の改善会議だけでも効果あり</li>
+          <li>コンテンツの型化が有効</li>
+          <li>リード活用シナリオを1本作ると成果が出る</li>
         </ul>
       </div>
 
       <div class="result-section-block">
-        <h3>4. 最後に</h3>
-        <p>「特段困ってはいないけど、少し気になる点はある」<br>
-        もしそのように感じていただけましたら、カジュアルに情報交換できれば幸いです。</p>
+        <h3>3. 最後に</h3>
+        <p>必要であればカジュアル相談も可能です。</p>
 
-        <a class="schedule-btn"
-          target="_blank"
-          href="https://app.spirinc.com/t/CAmffWBX3ySDvtaeImHEr/as/BjBcyr7Uvsc_P0GwDuO7C/confirm">
-          日程を調整する
-        </a>
+        <div class="widget-wrapper">
+          <div class="spir-widget" 
+              data-url="https://app.spirinc.com/external/teams/CAmffWBX3ySDvtaeImHEr/availability-sharings/BjBcyr7Uvsc_P0GwDuO7C/confirm"
+              style="min-width:320px;height:450px;">
+          </div>
+        </div>
       </div>
     `;
 
-    document.getElementById("report-wrapper").innerHTML = html;
-    document.getElementById("result-section").style.display = "block";
+    renderResult(html);
     return;
   }
 
-  /* ▼ 通常タイプ */
+  /* 通常タイプ */
   const def = typeDefinitions[type];
 
   html += `
-  <div class="result-section-block">
-    <h3>1. 冒頭サマリー</h3>
-    <p>${companyName}　${titleName} ${personName} 様<br>
-    診断にご協力いただき誠にありがとうございました。<br>
-    ご回答内容から拝見すると、貴社のサイト運用は
-    <strong>「${def.label}」</strong> の傾向が見られました。</p>
-  </div>`;
+    <div class="result-section-block">
+      <h3>1. 冒頭サマリー</h3>
+      <p>ご回答内容から<strong>${def.label}</strong>の傾向が見られました。</p>
+    </div>
 
-  html += `
-  <div class="result-section-block">
-    <h3>2. あなたのタイプ</h3>
-    <p><strong>${def.label}</strong></p>
-    <p>${def.description}</p>
-  </div>`;
+    <div class="result-section-block">
+      <h3>2. あなたのタイプ</h3>
+      <p><strong>${def.label}</strong></p>
+      <p>${def.description}</p>
+    </div>
 
-  html += `
-  <div class="result-section-block">
-    <h3>3. よくある失敗パターン</h3>
-    <ul>
-      ${def.failures.map(f=>`<li>${f}</li>`).join("")}
-    </ul>
-  </div>`;
+    <div class="result-section-block">
+      <h3>3. よくある失敗パターン</h3>
+      <ul>${def.failures.map(f=>`<li>${f}</li>`).join("")}</ul>
+    </div>
 
-  html += `
-  <div class="result-section-block">
-    <h3>4. まず取り組むべき3つのアクション</h3>
-    <ul>
-      ${def.actions.map(a=>`<li>${a}</li>`).join("")}
-    </ul>
-  </div>`;
+    <div class="result-section-block">
+      <h3>4. まず取り組むべき3つ</h3>
+      <ul>${def.actions.map(a=>`<li>${a}</li>`).join("")}</ul>
+    </div>
 
-  html += `
-  <div class="result-section-block">
-    <h3>5. 回答内容からのコメント</h3>
-    <ul>
-      ${
-        picked.length === 0
-        ? "<li>特に大きな課題は顕在化していませんが、今後に向けた基盤整備が有効です。</li>"
-        : picked.map(i=>`<li>${questionComments[i]}</li>`).join("")
-      }
-    </ul>
-  </div>`;
+    <div class="result-section-block">
+      <h3>5. 回答コメント</h3>
+      <ul>
+        ${
+          picked.length === 0
+          ? "<li>基盤整備を進めると効果が出やすいです。</li>"
+          : picked.map(i=>`<li>${questionComments[i]}</li>`).join("")
+        }
+      </ul>
+    </div>
 
-  html += `
-  <div class="result-section-block">
-    <h3>6. 最後に</h3>
-    <p>「すぐに取り入れるかは分からないけど、確かに気になる」<br>
-    もし少しでもそう感じていただけましたら、<br>
-    カジュアルなオンライン相談も承っております。</p>
+    <div class="result-section-block">
+      <h3>6. 最後に</h3>
+      <p>もし少しでも気になる点があれば、オンライン相談も可能です。</p>
 
-    <a class="schedule-btn"
-      target="_blank"
-      href="https://app.spirinc.com/t/CAmffWBX3ySDvtaeImHEr/as/BjBcyr7Uvsc_P0GwDuO7C/confirm">
-      日程を調整する
-    </a>
+      <div class="widget-wrapper">
+        <div class="spir-widget" 
+            data-url="https://app.spirinc.com/external/teams/CAmffWBX3ySDvtaeImHEr/availability-sharings/BjBcyr7Uvsc_P0GwDuO7C/confirm"
+            style="min-width:320px;height:450px;">
+        </div>
+      </div>
+    </div>
+  `;
 
-    <p style="margin-top:16px;">貴社の取り組みが今後さらに前に進む一助となれば幸いです。</p>
-  </div>`;
+  renderResult(html);
+}
 
+function renderResult(html) {
   document.getElementById("report-wrapper").innerHTML = html;
   document.getElementById("result-section").style.display = "block";
+
+  /* ウィジェット読込（最後に実行 → 確実に表示される） */
+  const script = document.createElement("script");
+  script.src = "https://app.spirinc.com/js/external/iframe.js";
+  script.async = true;
+  document.body.appendChild(script);
 }
 
 /* -----------------------
@@ -477,8 +391,10 @@ function showResult() {
 ------------------------ */
 document.getElementById("restart-btn").onclick = () => {
   document.getElementById("result-section").style.display = "none";
-  document.getElementById("question-section").style.display = "none";
-  document.getElementById("info-section").style.display = "block";
+  document.getElementById("question-section").style.display = "block";
+  answers = [];
+  currentQuestion = 0;
+  showQuestion();
 };
 </script>
 </body>
