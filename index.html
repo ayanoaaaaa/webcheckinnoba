@@ -241,6 +241,11 @@ const typeDefinitions = {
       "リード→商談の流れを簡易ファネルで見える化する",
       "施策前に“どこを強化する施策か”をA4一枚で共有する"
     ]
+  },
+  NONE: {
+    label: "課題顕在化なし",
+    description:
+      "大きな課題は特に見られず、基本的な運用は十分整っている可能性が高い状態です。"
   }
 };
 
@@ -314,7 +319,7 @@ function handleAnswer(val) {
 }
 
 /* -----------------------
-   タイプ判定 → HTML生成
+   タイトル判定ロジック（完全統合版）
 ------------------------ */
 function calcType() {
   const scores = {
@@ -322,19 +327,73 @@ function calcType() {
     B: typeQuestionMap.B.reduce((s, i) => s + answers[i], 0),
     C: typeQuestionMap.C.reduce((s, i) => s + answers[i], 0)
   };
+  const totalYes = scores.A + scores.B + scores.C;
+
+  // ① 全て「いいえ」なら NONE
+  if (totalYes === 0) return "NONE";
+
+  // ② C > A > B の優先順位
   const max = Math.max(scores.A, scores.B, scores.C);
   if (scores.C === max) return "C";
   if (scores.A === max) return "A";
   return "B";
 }
 
+/* -----------------------
+   診断結果のHTML生成
+------------------------ */
 function showResult() {
   const type = calcType();
-  const def = typeDefinitions[type];
   const yesList = answers.map((v,i) => v===1 ? i : null).filter(x => x !== null);
   const picked = yesList.slice(0,3);
 
   let html = "";
+
+  /* NONEの場合（課題顕在化なし） */
+  if (type === "NONE") {
+    html += `
+      <div class="result-section-block">
+        <h3>1. 冒頭サマリー</h3>
+        <p>${companyName}　${titleName} ${personName} 様<br>
+        診断にご協力いただき誠にありがとうございました。<br>
+        ご回答内容から拝見すると、貴社のサイト運用には
+        <strong>顕著な問題は見られませんでした。</strong></p>
+      </div>
+
+      <div class="result-section-block">
+        <h3>2. 現状の評価</h3>
+        <p>全体として大きく困っている点は少なく、基礎的な運用は十分整っていると推察されます。</p>
+      </div>
+
+      <div class="result-section-block">
+        <h3>3. 今後の伸びしろ</h3>
+        <ul>
+          <li>月1の定例で改善ポイントを確認するだけでも効果が出やすいです。</li>
+          <li>コンテンツの型化・テンプレ化により運用負荷をさらに下げられます。</li>
+          <li>リード活用のシナリオを1本だけ設計するだけでも成果につながります。</li>
+        </ul>
+      </div>
+
+      <div class="result-section-block">
+        <h3>4. 最後に</h3>
+        <p>「特段困っているわけではないが、気になる点はある」<br>
+        もしそのように感じていただけましたら、カジュアルに情報交換できれば幸いです。</p>
+
+        <a class="schedule-btn"
+          target="_blank"
+          href="https://app.spirinc.com/t/CAmffWBX3ySDvtaeImHEr/as/BjBcyr7Uvsc_P0GwDuO7C/confirm">
+          日程を調整する
+        </a>
+      </div>
+    `;
+
+    reportWrapper.innerHTML = html;
+    resultSection.style.display = "block";
+    return;
+  }
+
+  /* 通常タイプの処理 */
+  const def = typeDefinitions[type];
 
   /* 冒頭 */
   html += `
@@ -383,7 +442,7 @@ function showResult() {
     </ul>
   </div>`;
 
-  /* クロージング + ボタン */
+  /* クロージング */
   html += `
   <div class="result-section-block">
     <h3>6. 最後に</h3>
@@ -392,14 +451,13 @@ function showResult() {
     カジュアルなオンライン相談も承っております。</p>
 
     <a class="schedule-btn"
-       target="_blank"
-       href="https://app.spirinc.com/t/CAmffWBX3ySDvtaeImHEr/as/BjBcyr7Uvsc_P0GwDuO7C/confirm">
+      target="_blank"
+      href="https://app.spirinc.com/t/CAmffWBX3ySDvtaeImHEr/as/BjBcyr7Uvsc_P0GwDuO7C/confirm">
       日程を調整する
     </a>
 
     <p style="margin-top:16px;">貴社の取り組みが、今後さらに前に進む一助となれば幸いです。</p>
-  </div>
-  `;
+  </div>`;
 
   reportWrapper.innerHTML = html;
   resultSection.style.display = "block";
